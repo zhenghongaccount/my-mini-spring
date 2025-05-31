@@ -1,7 +1,7 @@
 package org.springframework.beans.factory.support;
 
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeansException;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 
 /**
@@ -16,6 +16,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
  * @date 2025/5/31
  */
 public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry implements BeanFactory {
+
     @Override
     public Object getBean(String name) throws BeansException {
         Object singleton = getSingleton(name);

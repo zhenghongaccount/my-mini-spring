@@ -1,4 +1,4 @@
-package org.springframework.beans.factory;
+package org.springframework.beans;
 
 /**
  * 自定义bean异常

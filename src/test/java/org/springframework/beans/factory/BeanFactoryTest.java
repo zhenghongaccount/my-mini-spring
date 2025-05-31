@@ -1,16 +1,31 @@
 package org.springframework.beans.factory;
 
 import org.junit.Test;
+import org.springframework.beans.PropertyValue;
+import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
+/**
+ * 端午安康
+ * @author zhenghong
+ * @date 2025/5/30
+ */
 public class BeanFactoryTest {
     @Test
     public void testBeanFactory() throws Exception{
-        DefaultListableBeanFactory defaultListableBeanFactory = new DefaultListableBeanFactory();
-        BeanDefinition beanDefinition = new BeanDefinition(HelloService.class);
-        defaultListableBeanFactory.registerBeanDefinition("helloService", beanDefinition);
-        HelloService bean = (HelloService)defaultListableBeanFactory.getBean("helloService");
-        bean.sayHello();
+        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+        PropertyValues propertyValues = new PropertyValues();
+        propertyValues.addPropertyValue(new PropertyValue("foo", "hello"));
+        propertyValues.addPropertyValue(new PropertyValue("bar", "world"));
+        BeanDefinition beanDefinition = new BeanDefinition(HelloService.class, propertyValues);
+        beanFactory.registerBeanDefinition("helloService", beanDefinition);
+
+        HelloService helloService = (HelloService) beanFactory.getBean("helloService");
+        System.out.println(helloService.toString());
+        assertThat(helloService.getFoo()).isEqualTo("hello");
+        assertThat(helloService.getBar()).isEqualTo("world");
     }
 }
