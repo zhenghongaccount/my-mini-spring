@@ -1,10 +1,12 @@
 package org.springframework.beans.factory.support;
 
+import cn.hutool.Hutool;
+import cn.hutool.core.bean.BeanUtil;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValue;
+import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 /**
@@ -44,16 +46,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      */
     protected void applyPropertyValues(String beanName, Object bean, BeanDefinition beanDefinition) {
         try {
-            Class<?> beanClass = beanDefinition.getBeanClass();
+            PropertyValues propertyValues = beanDefinition.getPropertyValues();
+            if (propertyValues == null) {
+                return;
+            }
+            for (PropertyValue propertyValue : propertyValues.getPropertyValues()) {
+                String name = propertyValue.name();
+                Object value = propertyValue.value();
 
-            for (PropertyValue propertyValue : beanDefinition.getPropertyValues().getPropertyValues()) {
-                String name = propertyValue.getName();
-                Object value = propertyValue.getValue();
-
-                Class<?> type = beanClass.getDeclaredField(name).getType();
-                String methodName = "set" + name.substring(0,1).toUpperCase() + name.substring(1);
-                Method method = beanClass.getDeclaredMethod(methodName, type);
-                method.invoke(bean,value);
+                //通过HuTool经过反射设置属性而不是通过set方法
+                BeanUtil.setFieldValue(bean, name, value);
             }
         } catch (Exception e) {
             throw new BeansException("Error setting property values for bean: " + beanName, e);

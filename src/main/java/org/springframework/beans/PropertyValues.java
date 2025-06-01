@@ -23,7 +23,7 @@ public class PropertyValues {
 
     public PropertyValue getPropertyValue(String propertyName) {
         for (PropertyValue propertyValue : this.propertyValueList) {
-            if (propertyValue.getName().equals(propertyName)) {
+            if (propertyValue.name().equals(propertyName)) {
                 return propertyValue;
             }
         }

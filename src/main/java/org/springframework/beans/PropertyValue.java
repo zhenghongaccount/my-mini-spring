@@ -7,21 +7,19 @@ package org.springframework.beans;
  * @date 2025/5/31
  */
 public class PropertyValue {
-
     private final String name;
+    private final Object value;
 
-    private final String value;
-
-    public PropertyValue(String name, String value) {
+    public PropertyValue(String name, Object value) {
         this.name = name;
         this.value = value;
     }
 
-    public String getName() {
+    public String name() {
         return name;
     }
 
-    public String getValue() {
+    public Object value() {
         return value;
     }
 }
