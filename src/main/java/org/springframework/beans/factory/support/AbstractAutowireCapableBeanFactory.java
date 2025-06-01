@@ -6,6 +6,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanReference;
 
 import java.lang.reflect.Method;
 
@@ -53,6 +54,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             for (PropertyValue propertyValue : propertyValues.getPropertyValues()) {
                 String name = propertyValue.name();
                 Object value = propertyValue.value();
+
+                if (value instanceof BeanReference beanReference) {
+                    String referenceBeanName = beanReference.getBeanName();
+                    value = getBean(referenceBeanName);
+                }
 
                 //通过HuTool经过反射设置属性而不是通过set方法
                 BeanUtil.setFieldValue(bean, name, value);
