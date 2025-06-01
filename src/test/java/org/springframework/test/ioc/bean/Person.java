@@ -1,4 +1,4 @@
-package org.springframework.bean;
+package org.springframework.test.ioc.bean;
 
 /**
  * @author zhenghong
