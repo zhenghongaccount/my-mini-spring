@@ -1,6 +1,7 @@
-package org.springframework.beans.factory;
+package org.springframework.test.ioc;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.springframework.bean.Person;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -9,21 +10,10 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 /**
- * 端午安康
  * @author zhenghong
- * @date 2025/5/30
+ * @date 2025/6/1
  */
-public class BeanFactoryTest {
-    @Test
-    public void testGetBean() throws Exception{
-        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
-        BeanDefinition beanDefinition = new BeanDefinition(HelloService.class);
-        beanFactory.registerBeanDefinition("helloService", beanDefinition);
-
-        HelloService helloService = (HelloService) beanFactory.getBean("helloService");
-        assertThat(helloService).isNotNull();
-        helloService.sayHello();
-    }
+public class PopulateBeanWithPropertyValuesTest {
 
     @Test
     public void testPopulateBeanWithPropertyValues() throws Exception {
@@ -39,5 +29,4 @@ public class BeanFactoryTest {
         assertThat(person.getName()).isEqualTo("derek");
         assertThat(person.getAge()).isEqualTo(18);
     }
-
 }
