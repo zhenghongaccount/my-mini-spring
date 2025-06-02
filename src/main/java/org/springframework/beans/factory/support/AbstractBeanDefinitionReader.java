@@ -1,6 +1,7 @@
 package org.springframework.beans.factory.support;
 
 import org.springframework.beans.BeansException;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 
 /**
@@ -25,6 +26,10 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
         for (String location : locations) {
             loadBeanDefinitions(location);
         }
+    }
+
+    public AbstractBeanDefinitionReader(BeanDefinitionRegistry registry) {
+        this(registry,new DefaultResourceLoader());
     }
 
     public AbstractBeanDefinitionReader(BeanDefinitionRegistry registry, ResourceLoader resourceLoader) {

@@ -14,6 +14,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -42,12 +43,12 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
             try (InputStream inputStream = resource.getInputStream()) {
                 doLoadBeanDefinitions(inputStream);
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new BeansException("IOException parsing XML document from " + resource, e);
         }
     }
 
-    protected void doLoadBeanDefinitions(InputStream inputStream) throws Exception {
+    protected void doLoadBeanDefinitions(InputStream inputStream) {
         Document document = XmlUtil.readXML(inputStream);
         Element root = document.getDocumentElement();
         NodeList childNodes = root.getChildNodes();
@@ -59,7 +60,12 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
                     String name = bean.getAttribute(NAME_ATTRIBUTE);
                     String className = bean.getAttribute(CLASS_ATTRIBUTE);
 
-                    Class<?> clazz = Class.forName(className);
+                    Class<?> clazz = null;
+                    try {
+                        clazz = Class.forName(className);
+                    } catch (ClassNotFoundException e) {
+                        throw new BeansException("Cannot find class [" + className + "]");
+                    }
 
                     //id优先级比value高
                     String beanName = StrUtil.isNotEmpty(id) ? id : name;
@@ -79,6 +85,10 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
                                 String valueAttribute = property.getAttribute(VALUE_ATTRIBUTE);
                                 String refAttribute = property.getAttribute(REF_ATTRIBUTE);
 
+                                if (StrUtil.isEmpty(nameAttribute)) {
+                                    throw new BeansException("The name attribute cannot be null or empty");
+                                }
+
                                 Object value = valueAttribute;
                                 if (StrUtil.isNotEmpty(refAttribute)) {
                                     value = new BeanReference(refAttribute);
@@ -87,6 +97,9 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
                                 beanDefinition.getPropertyValues().addPropertyValue(propertyValue);
                             }
                         }
+                    }
+                    if (getRegistry().containsBeanDefinition(beanName)) {
+                        throw new BeansException("Duplicate beanName[" + beanName + "] is not allowed");
                     }
                     getRegistry().registerBeanDefinition(beanName, beanDefinition);
                 }
