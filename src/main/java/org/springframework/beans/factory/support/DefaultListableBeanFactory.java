@@ -6,6 +6,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 结合了自动装装配功能和注册获取bean定义动能的工厂
@@ -51,5 +52,11 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
             }
         });
         return result;
+    }
+
+    @Override
+    public String[] getBeanDefinitionNames() {
+        Set<String> names = beanDefinitionMap.keySet();
+        return names.toArray(new String[0]);
     }
 }
