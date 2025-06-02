@@ -17,9 +17,6 @@ public class DefaultResourceLoader implements ResourceLoader {
                 URL url = new URL(location);
                 return new UrlResource(url);
             } catch (MalformedURLException e) {
-                if (location.startsWith("/")) {
-                    return new FileSystemResource(location.substring(1));
-                }
                 return new FileSystemResource(location);
             }
         }
