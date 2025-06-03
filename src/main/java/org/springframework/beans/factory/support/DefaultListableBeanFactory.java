@@ -9,14 +9,14 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 结合了自动装装配功能和注册获取bean定义动能的工厂
+ * 结合了自动装装配功能和注册获取 bean 定义动能的工厂
  *
  * @author zhenghong
  * @date 2025/5/31
  */
 public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory implements ConfigurableListableBeanFactory,BeanDefinitionRegistry {
 
-    private Map<String, BeanDefinition> beanDefinitionMap = new HashMap<>();
+    private final Map<String, BeanDefinition> beanDefinitionMap = new HashMap<>();
 
     @Override
     public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition) {

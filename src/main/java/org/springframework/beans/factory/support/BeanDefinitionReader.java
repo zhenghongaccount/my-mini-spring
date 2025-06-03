@@ -5,7 +5,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
 /**
- * 从配置中读取Bean信息的加载器，结合了加载资源和注册Bean信息的能力，即结合了BeanDefinitionRegistry和ResourceLoader
+ * 从配置中读取 Bean 信息的加载器，结合了加载资源和注册 Bean 信息的能力，即结合了 BeanDefinitionRegistry 和 ResourceLoader
+ *
+ * @author zhenghong
+ * @date 2025/6/1
  */
 public interface BeanDefinitionReader {
 

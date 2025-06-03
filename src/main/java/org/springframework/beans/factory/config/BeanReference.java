@@ -1,7 +1,7 @@
 package org.springframework.beans.factory.config;
 
 /**
- * 一个Bean对另一个Bean的引用
+ * 一个 Bean 对另一个 Bean 的引用
  *
  * @author zhenghong
  * @date 2025/6/1

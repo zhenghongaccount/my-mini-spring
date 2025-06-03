@@ -15,11 +15,11 @@ public class PropertyValue {
         this.value = value;
     }
 
-    public String name() {
+    public String getName() {
         return name;
     }
 
-    public Object value() {
+    public Object getValue() {
         return value;
     }
 }
