@@ -13,7 +13,7 @@ import java.util.Map;
 public interface ListableBeanFactory extends BeanFactory {
 
     /**
-     * 人居classType查找bean
+     * 根据classType查找bean
      * @param type classType
      * @return Map<String,T>
      * @param <T> T

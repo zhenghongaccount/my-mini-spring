@@ -1,6 +1,6 @@
 package org.springframework.beans.factory.config;
 
-import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.HierarchicalBeanFactory;
 
 /**
  * ConfigurableBeanFactory 是 Spring 容器中用于配置 BeanFactory 行为的接口，
@@ -13,7 +13,7 @@ import org.springframework.beans.factory.BeanFactory;
  * @author zhenghong
  * @date 2025/6/3
  */
-public interface ConfigurableBeanFactory extends BeanFactory,SingletonBeanRegistry {
+public interface ConfigurableBeanFactory extends HierarchicalBeanFactory,SingletonBeanRegistry {
 
     /**
      * 向容器中添加一个 BeanPostProcessor。

@@ -1,7 +1,10 @@
 package org.springframework.beans.factory;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.AutowiredCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 
 /**
  * ConfigurableListableBeanFactory 是一个“可配置 + 可列出”的高级容器接口，
@@ -11,7 +14,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
  * @author zhenghong
  * @date 2025/6/2
  */
-public interface ConfigurableListableBeanFactory extends ListableBeanFactory{
+public interface ConfigurableListableBeanFactory extends ListableBeanFactory, AutowiredCapableBeanFactory, ConfigurableBeanFactory {
 
     /**
      * 根据名字查找BeanDefinition
@@ -28,4 +31,13 @@ public interface ConfigurableListableBeanFactory extends ListableBeanFactory{
      * @throws BeansException 抛出BeansException
      */
     void preInstantiateSingletons() throws BeansException;
+
+    /**
+     * 向容器中添加一个 BeanPostProcessor。
+     * BeanPostProcessor 用于在 Bean 初始化前后执行自定义逻辑，由用户自行实现
+     * 是实现 AOP、依赖注入等逻辑的重要扩展点
+     *
+     * @param beanPostProcessor 要添加的 BeanPostProcessor 实例
+     */
+    void addBeanPostProcessor(BeanPostProcessor beanPostProcessor);
 }
