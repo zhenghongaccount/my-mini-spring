@@ -37,4 +37,27 @@ public interface ConfigurableApplicationContext extends ApplicationContext {
      */
     void refresh() throws BeansException;
 
+    /**
+     * 关闭容器：释放资源并销毁所有单例 Bean。
+     * <p>
+     * - 会执行所有注册的销毁回调，如 DisposableBean、destroy-method
+     * - 发布 ContextClosedEvent 事件
+     * - 释放 ApplicationContext 中注册的所有资源（如线程池、文件句柄）
+     * <p>
+     * 手动关闭应用上下文的场景包括测试、脚本任务等。
+     *
+     * @throws BeansException 如果关闭过程中出现错误
+     */
+    void close() throws BeansException;
+
+    /**
+     * 注册 JVM 关闭钩子：当 JVM 正常关闭时，自动调用 close() 方法以销毁容器。
+     * <p>
+     * 通常用于独立应用（如 Spring Boot 主程序）中，确保退出时资源被正确释放。
+     * <p>
+     * 示例：
+     *   context.registerShutdownHook();
+     */
+    void registerShutdownHook();
+
 }

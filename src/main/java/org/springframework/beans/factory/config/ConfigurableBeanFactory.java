@@ -24,4 +24,16 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory,Singlet
      */
     void addBeanPostProcessor(BeanPostProcessor beanPostProcessor);
 
+    /**
+     * 销毁当前容器中所有的单例（singleton）Bean。
+     * <p>
+     * 该方法会触发每个已注册的单例 Bean 的销毁过程，包括：
+     * - 调用实现了 DisposableBean 接口的 Bean 的 destroy() 方法
+     * - 调用通过 destroy-method 显式声明的销毁方法
+     * - 调用 @PreDestroy 注解的方法（如果有）
+     * <p>
+     * 通常在容器关闭时（如 ApplicationContext.close()）会自动调用此方法，
+     * 也可以手动调用，用于资源释放、清理缓存、关闭连接等操作。
+     */
+    void destroySingletons();
 }
