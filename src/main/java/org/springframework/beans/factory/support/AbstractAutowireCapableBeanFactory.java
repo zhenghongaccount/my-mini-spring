@@ -7,6 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.PropertyValues;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.AutowiredCapableBeanFactory;
@@ -75,6 +76,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      * 3. 调用 BeanPostProcessor 的后置方法
      */
     protected Object initializeBean(String beanName,Object bean,BeanDefinition beanDefinition) {
+        if (bean instanceof BeanFactoryAware) {
+            ((BeanFactoryAware) bean).setBeanFactory(this);
+        }
+
         //执行BeanPostProcessor的前置处理
         Object wrappedBean = applyBeanPostProcessorsBeforeInitialization(bean, beanName);
 
