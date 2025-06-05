@@ -35,6 +35,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
     public static final String REF_ATTRIBUTE = "ref";
     public static final String INIT_METHOD_ATTRIBUTE = "init-method";
     public static final String DESTROY_METHOD_ATTRIBUTE = "destroy-method";
+    public static final String SCOPE_ATTRIBUTE = "scope";
     
     public XmlBeanDefinitionReader(BeanDefinitionRegistry registry, ResourceLoader resourceLoader) {
         super(registry, resourceLoader);
@@ -67,6 +68,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
             String className = bean.attributeValue(CLASS_ATTRIBUTE);
             String initMethodName = bean.attributeValue(INIT_METHOD_ATTRIBUTE);
             String destroyMethodName = bean.attributeValue(DESTROY_METHOD_ATTRIBUTE);
+            String scope = bean.attributeValue(SCOPE_ATTRIBUTE);
 
             Class<?> clazz;
 
@@ -86,6 +88,9 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
             BeanDefinition beanDefinition = new BeanDefinition(clazz);
             beanDefinition.setInitMethodName(initMethodName);
             beanDefinition.setDestroyMethodName(destroyMethodName);
+            if (StrUtil.isNotEmpty(scope)) {
+                beanDefinition.setScope(scope);
+            }
 
             List<Element> propertyList = bean.elements(PROPERTY_ELEMENT);
             for (Element property : propertyList) {
