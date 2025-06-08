@@ -1,8 +1,8 @@
-package org.springframework.test.ioc;
+package org.springframework.test;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.test.ioc.common.event.CustomEvent;
+import org.springframework.test.common.event.CustomEvent;
 
 public class EventAndEventListenerTest {
 

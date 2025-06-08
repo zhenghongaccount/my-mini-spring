@@ -1,8 +1,8 @@
-package org.springframework.test.ioc;
+package org.springframework.test;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.test.ioc.bean.Car;
-import org.springframework.test.ioc.bean.Person;
+import org.springframework.test.bean.Car;
+import org.springframework.test.bean.Person;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;

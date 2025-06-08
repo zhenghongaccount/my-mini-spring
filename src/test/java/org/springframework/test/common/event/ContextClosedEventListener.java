@@ -1,6 +1,5 @@
-package org.springframework.test.ioc.common.event;
+package org.springframework.test.common.event;
 
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 

@@ -1,4 +1,4 @@
-package org.springframework.test.ioc;
+package org.springframework.test;
 
 import cn.hutool.core.io.IoUtil;
 import org.junit.jupiter.api.Test;
