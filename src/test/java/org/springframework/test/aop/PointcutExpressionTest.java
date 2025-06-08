@@ -1,4 +1,4 @@
-package org.springframework.test.apo;
+package org.springframework.test.aop;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.aop.aspectj.AspectJExpressionPointcut;
