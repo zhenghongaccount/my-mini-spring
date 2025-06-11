@@ -24,6 +24,8 @@ import org.aopalliance.intercept.MethodInterceptor;
  */
 public class AdvisedSupport {
 
+    private boolean proxyTargetClass = false;
+
     // 封装被代理的目标对象（以及其类型信息）
     private TargetSource targetSource;
 
@@ -32,6 +34,14 @@ public class AdvisedSupport {
 
     // 方法匹配器，决定哪些方法应该被拦截（基于切点表达式）
     private MethodMatcher methodMatcher;
+
+    public boolean isProxyTargetClass() {
+        return proxyTargetClass;
+    }
+
+    public void setProxyTargetClass(boolean proxyTargetClass) {
+        this.proxyTargetClass = proxyTargetClass;
+    }
 
     public TargetSource getTargetSource() {
         return targetSource;
