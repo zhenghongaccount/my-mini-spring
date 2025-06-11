@@ -43,13 +43,13 @@ import java.lang.reflect.Method;
 public class ReflectiveMethodInvocation implements MethodInvocation {
 
     /** 目标对象（被代理的原始对象） */
-    private final Object target;
+    protected final Object target;
 
     /** 被调用的反射方法对象 */
-    private final Method method;
+    protected final Method method;
 
     /** 方法调用参数数组 */
-    private final Object[] arguments;
+    protected final Object[] arguments;
 
     public ReflectiveMethodInvocation(final Object target, final Method method, final Object[] arguments) {
         this.target = target;
