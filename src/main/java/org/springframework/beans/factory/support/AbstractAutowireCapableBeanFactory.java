@@ -10,12 +10,10 @@ import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.config.AutowiredCapableBeanFactory;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.beans.factory.config.BeanReference;
+import org.springframework.beans.factory.config.*;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * 抽象的自动装配 Bean 工厂，是 BeanFactory 的核心实现之一。
@@ -36,7 +34,62 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
     @Override
     protected Object createBean(String name, BeanDefinition beanDefinition) throws BeansException {
+        // 如果 bean 需要代理，直接返回代理对象
+        Object bean = resolveBeforeInstantiation(name, beanDefinition);
+        if (bean != null) {
+            return bean;
+        }
         return doCreateBean(name, beanDefinition);
+    }
+
+    /**
+     * 尝试在标准实例化流程之前解析 bean 实例。
+     *
+     * <p>主要目的是允许某些 {@link InstantiationAwareBeanPostProcessor} 实现
+     * （如 AOP 自动代理器）返回一个代理对象，提前跳过后续的默认创建流程。
+     *
+     * @param beanName bean 的名称
+     * @param beanDefinition bean 的定义信息
+     * @return 提前解析得到的对象，如果返回 null，则继续执行默认的创建流程
+     */
+    protected Object resolveBeforeInstantiation(final String beanName, final BeanDefinition beanDefinition) throws BeansException {
+        // 调用 InstantiationAwareBeanPostProcessor 的 postProcessBeforeInstantiation 方法
+        // 尝试提前返回一个对象（比如代理）
+        Object bean = applyBeanPostProcessorsBeforeInstantiation(beanDefinition.getBeanClass(), beanName);
+        // 如果有处理器返回了非 null 的 bean（比如 AOP 生成的代理对象）
+        if (bean != null) {
+            // 再调用所有 BeanPostProcessor 的 postProcessAfterInitialization 方法
+            // 对这个提前返回的 bean 进行初始化后的增强处理
+            bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
+        }
+        return bean;
+    }
+
+    /**
+     * 调用所有 {@link InstantiationAwareBeanPostProcessor} 的
+     * {@code postProcessBeforeInstantiation} 方法，允许其提前返回一个自定义对象。
+     *
+     * <p>这是 Spring 提供的一个“跳过默认实例化流程”的入口。
+     * 如果任一处理器返回了非 null，则直接使用该对象作为最终的 bean 实例。
+     *
+     * @param beanClass 当前正在创建的 bean 的类
+     * @param beanName bean 的名称
+     * @return 提前返回的 bean 实例（如代理对象），或 null 表示不干预
+     *
+     * @author zhenghong
+     * @date 2025/6/12
+     */
+    protected Object applyBeanPostProcessorsBeforeInstantiation(Class<?> beanClass, String beanName) {
+        List<BeanPostProcessor> beanPostProcessors = getBeanPostProcessors();
+        for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
+                Object result = ((InstantiationAwareBeanPostProcessor) beanPostProcessor).postProcessBeforeInstantiation(beanClass, beanName);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+        return null;
     }
 
     /**
