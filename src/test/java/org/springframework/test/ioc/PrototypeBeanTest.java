@@ -1,4 +1,4 @@
-package org.springframework.test;
+package org.springframework.test.ioc;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;

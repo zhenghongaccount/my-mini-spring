@@ -2,6 +2,8 @@ package org.springframework.beans.factory.config;
 
 import org.springframework.beans.PropertyValues;
 
+import java.util.Objects;
+
 /**
  * BeanDefinition 实例保存 bean 的信息，包括 class 类型、方法构造参数、是否为单例等，此处简化只包含 class 类型
  *
@@ -35,6 +37,19 @@ public class BeanDefinition {
     public BeanDefinition(Class<?> beanClass, PropertyValues propertyValues) {
         BeanClass = beanClass;
         this.propertyValues = propertyValues != null ? propertyValues : new PropertyValues();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        BeanDefinition that = (BeanDefinition) obj;
+        return BeanClass.equals(that.BeanClass);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(BeanClass);
     }
 
     public void setScope(String scope) {

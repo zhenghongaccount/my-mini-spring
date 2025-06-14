@@ -1,9 +1,12 @@
 package org.springframework.test.bean;
 
+import org.springframework.stereotype.Component;
+
 /**
  * @author zhenghong
  * @date 2025/6/1
  */
+@Component
 public class Car {
 
     private String brand;

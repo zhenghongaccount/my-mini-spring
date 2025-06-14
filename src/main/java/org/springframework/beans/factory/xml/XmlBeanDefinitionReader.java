@@ -11,6 +11,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinitionReader;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
@@ -36,6 +37,8 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
     public static final String INIT_METHOD_ATTRIBUTE = "init-method";
     public static final String DESTROY_METHOD_ATTRIBUTE = "destroy-method";
     public static final String SCOPE_ATTRIBUTE = "scope";
+    public static final String COMPONENT_SCAN_ATTRIBUTE = "component-scan";
+    public static final String BASE_PACKAGE_ATTRIBUTE = "base-package";
     
     public XmlBeanDefinitionReader(BeanDefinitionRegistry registry, ResourceLoader resourceLoader) {
         super(registry, resourceLoader);
@@ -60,8 +63,20 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
         SAXReader reader = new SAXReader();
         Document document = reader.read(inputStream);
 
-        Element beans = document.getRootElement();
-        List<Element> beanList = beans.elements(BEAN_ELEMENT);
+        Element root = document.getRootElement();
+
+        // 解析包扫描
+        Element componentScan = root.element(COMPONENT_SCAN_ATTRIBUTE);
+        if (componentScan != null) {
+            String scanPath = componentScan.attributeValue(BASE_PACKAGE_ATTRIBUTE);
+            if (StrUtil.isEmpty(scanPath)) {
+                throw new BeansException("The value of base-package attribute can not be empty or null");
+            }
+            scanPackages(scanPath);
+        }
+
+        // 解析 bean 标签
+        List<Element> beanList = root.elements(BEAN_ELEMENT);
         for (Element bean : beanList) {
             String beanId = bean.attributeValue(ID_ATTRIBUTE);
             String beanName = bean.attributeValue(NAME_ATTRIBUTE);
@@ -78,10 +93,10 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
                 throw new BeansException("Cannot find class [" + className + "]");
             }
 
-            //id优先于name
+            //id 优先于 name
             beanName = StrUtil.isNotEmpty(beanId) ? beanId : beanName;
             if (StrUtil.isEmpty(beanName)) {
-                //如果id和name都为空，将类名的第一个字母转为小写后作为bean的名称
+                //如果 id 和 name 都为空，将类名的第一个字母转为小写后作为 bean 的名称
                 beanName = StrUtil.lowerFirst(clazz.getSimpleName());
             }
 
@@ -111,12 +126,18 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
                 beanDefinition.getPropertyValues().addPropertyValue(propertyValue);
             }
             if (getRegistry().containsBeanDefinition(beanName)) {
-                //beanName不能重名
+                //beanName 不能重名
                 throw new BeansException("Duplicate beanName[" + beanName + "] is not allowed");
             }
             //注册BeanDefinition
             getRegistry().registerBeanDefinition(beanName, beanDefinition);
         }
+    }
+
+    private void scanPackages(String scanPath) {
+        String[] basePackages = StrUtil.splitToArray(scanPath,',');
+        ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(getRegistry());
+        scanner.doScan(basePackages);
     }
 
     @Override
