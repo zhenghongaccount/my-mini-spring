@@ -32,4 +32,20 @@ public interface BeanFactory {
      * @throws BeansException 如果 Bean 不存在或类型不匹配
      */
     <T> T getBean(String name, Class<T> requiredType) throws BeansException;
+
+    /**
+     * 根据所需类型从容器中获取唯一的 Bean 实例。
+     * <p>
+     * 如果容器中存在多个该类型的 Bean，将抛出 {@link BeansException} 异常；
+     * 如果不存在任何匹配的 Bean，也会抛出异常。
+     *
+     * @param requiredType 要获取的 Bean 的类型
+     * @param <T> 返回的 Bean 类型
+     * @return 与指定类型匹配的唯一 Bean 实例
+     * @throws BeansException 如果匹配不到或匹配多个 Bean 时抛出
+     *
+     * @author zhenghong
+     * @date 2015/6/15
+     */
+    <T> T getBean(Class<T> requiredType) throws BeansException;
 }
