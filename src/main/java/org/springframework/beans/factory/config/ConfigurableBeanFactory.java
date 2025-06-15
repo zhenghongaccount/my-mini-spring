@@ -1,6 +1,7 @@
 package org.springframework.beans.factory.config;
 
 import org.springframework.beans.factory.HierarchicalBeanFactory;
+import org.springframework.util.StringValueResolver;
 
 /**
  * ConfigurableBeanFactory 是 Spring 容器中用于配置 BeanFactory 行为的接口，
@@ -15,25 +16,11 @@ import org.springframework.beans.factory.HierarchicalBeanFactory;
  */
 public interface ConfigurableBeanFactory extends HierarchicalBeanFactory,SingletonBeanRegistry {
 
-    /**
-     * 向容器中添加一个 BeanPostProcessor。
-     * BeanPostProcessor 用于在 Bean 初始化前后执行自定义逻辑，由用户自行实现
-     * 是实现 AOP、依赖注入等逻辑的重要扩展点
-     *
-     * @param beanPostProcessor 要添加的 BeanPostProcessor 实例
-     */
     void addBeanPostProcessor(BeanPostProcessor beanPostProcessor);
 
-    /**
-     * 销毁当前容器中所有的单例（singleton）Bean。
-     * <p>
-     * 该方法会触发每个已注册的单例 Bean 的销毁过程，包括：
-     * - 调用实现了 DisposableBean 接口的 Bean 的 destroy() 方法
-     * - 调用通过 destroy-method 显式声明的销毁方法
-     * - 调用 @PreDestroy 注解的方法（如果有）
-     * <p>
-     * 通常在容器关闭时（如 ApplicationContext.close()）会自动调用此方法，
-     * 也可以手动调用，用于资源释放、清理缓存、关闭连接等操作。
-     */
     void destroySingletons();
+
+    void addEmbeddedValueResolver(StringValueResolver valueResolver);
+
+    String resolveEmbeddedValue(String value);
 }

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
+import org.springframework.util.StringValueResolver;
 
 import java.io.InputStream;
 import java.util.Properties;
@@ -57,6 +58,8 @@ public class PropertyPlaceholderConfigurer implements BeanFactoryPostProcessor {
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         Properties properties = loadProperties();
         processProperties(beanFactory, properties);
+        PlaceholderResolvingStringValueResolver valueResolver = new PlaceholderResolvingStringValueResolver(properties);
+        beanFactory.addEmbeddedValueResolver(valueResolver);
     }
 
     /**
@@ -103,20 +106,42 @@ public class PropertyPlaceholderConfigurer implements BeanFactoryPostProcessor {
         for (PropertyValue propertyValue : propertyValues.getPropertyValues()) {
             Object value = propertyValue.getValue();
             if (value instanceof String) {
-                StringBuilder buf = new StringBuilder((String) value);
-                int startIndex = buf.indexOf(PLACEHOLDER_PREFIX);
-                int endIndex = buf.indexOf(PLACEHOLDER_SUFFIX);
-                if (startIndex != -1 && endIndex != -1 && startIndex < endIndex) {
-                    String propKey = buf.substring(startIndex + 2, endIndex);
-                    String propVal = properties.getProperty(propKey);
-                    buf.replace(startIndex, endIndex + 1, propVal);
-                    propertyValues.addPropertyValue(new PropertyValue(propertyValue.getName(), buf.toString()));
-                }
+                value = resolvePlaceHolder(value.toString(), properties);
+                propertyValues.addPropertyValue(new PropertyValue(propertyValue.getName(), value));
             }
         }
     }
 
+    private String resolvePlaceHolder(String value, Properties properties) {
+        //TODO 仅简单支持一个占位符的格式
+        String strVal = value;
+        StringBuffer buf = new StringBuffer(strVal);
+        int startIndex = strVal.indexOf(PLACEHOLDER_PREFIX);
+        int endIndex = strVal.indexOf(PLACEHOLDER_SUFFIX);
+        if (startIndex != -1 && endIndex != -1 && startIndex < endIndex) {
+            String propKey = strVal.substring(startIndex + 2, endIndex);
+            String propVal = properties.getProperty(propKey);
+            buf.replace(startIndex, endIndex + 1, propVal);
+        }
+        return buf.toString();
+    }
+
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    private class PlaceholderResolvingStringValueResolver implements StringValueResolver {
+
+        private final Properties properties;
+
+        public PlaceholderResolvingStringValueResolver(Properties properties) {
+            this.properties = properties;
+        }
+
+        @Override
+        public String resolveStringValue(String strVal) {
+            return PropertyPlaceholderConfigurer.this.resolvePlaceHolder(strVal, properties);
+        }
+
     }
 }

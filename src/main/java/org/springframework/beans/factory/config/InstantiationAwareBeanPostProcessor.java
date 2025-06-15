@@ -1,6 +1,7 @@
 package org.springframework.beans.factory.config;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.PropertyValues;
 
 /**
  * {@code InstantiationAwareBeanPostProcessor} 是 {@link org.springframework.beans.factory.config.BeanPostProcessor} 的一个扩展接口，
@@ -39,5 +40,22 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor{
      * @throws BeansException 如果创建过程出错，可以抛出该异常阻止 Bean 的进一步创建
      */
     Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException;
+
+    /**
+     * 在属性注入（依赖注入）之前对 {@link PropertyValues} 进行后置处理的扩展点。
+     * <p>
+     * 这个方法允许开发者自定义修改即将注入到 bean 实例中的属性值集合，
+     * 例如实现对字段的自动注入（如 @Autowired）、值的校验、动态属性添加等。
+     * <p>
+     * 此方法在 Spring 容器进行属性填充（populate）阶段调用，执行时机早于
+     * {@link BeanPostProcessor#postProcessBeforeInitialization}。
+     *
+     * @param pvs      容器准备注入到 bean 中的属性值集合，可以为 null。
+     * @param bean     当前 bean 实例，已经完成实例化，但尚未进行属性注入。
+     * @param beanName 当前 bean 在容器中的名称，便于识别或条件控制。
+     * @return 处理后的属性值集合，不能为 null；通常返回原始 pvs，或其修改版本。
+     * @throws BeansException 如果处理过程中出现错误，可抛出异常阻止创建流程。
+     */
+    PropertyValues postProcessPropertyValues(PropertyValues pvs, Object bean, String beanName) throws BeansException;
 
 }
