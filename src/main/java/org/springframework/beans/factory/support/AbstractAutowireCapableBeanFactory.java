@@ -33,8 +33,34 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     public InstantiationStrategy instantiationStrategy = new SimpleInstantiationStrategy();
 
     @Override
-    protected Object createBean(String name, BeanDefinition beanDefinition) throws BeansException {
-        return doCreateBean(name, beanDefinition);
+    protected Object createBean(String beanName, BeanDefinition beanDefinition) throws BeansException {
+        //如果bean需要代理，则直接返回代理对象
+        Object bean = resolveBeforeInstantiation(beanName, beanDefinition);
+        if (bean != null) {
+            return bean;
+        }
+        return doCreateBean(beanName, beanDefinition);
+    }
+
+    protected Object resolveBeforeInstantiation(String beanName, BeanDefinition beanDefinition) {
+        Object bean = applyBeanPostProcessorsBeforeInstantiation(beanDefinition.getBeanClass(), beanName);
+        if (bean != null) {
+            bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
+        }
+        return bean;
+    }
+
+    protected Object applyBeanPostProcessorsBeforeInstantiation(Class<?> beanClass, String beanName) {
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
+                Object result = ((InstantiationAwareBeanPostProcessor) beanPostProcessor).postProcessBeforeInstantiation(beanClass, beanName);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -49,6 +75,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         Object bean = null;
         try {
             bean = createBeanInstance(beanDefinition);
+            //实例化 bean 之后执行
+            boolean continueWithPropertyPopulation = applyBeanPostProcessorsAfterInstantiation(beanName, bean);
+            if (!continueWithPropertyPopulation) {
+                return bean;
+            }
             // 在设置 bean 属性之前，允许 BeanPostProcessor 修改属性值
             applyBeanPostprocessorsBeforeApplyingProperties(beanName, bean, beanDefinition);
             // 为 bean 设置属性值
@@ -64,6 +95,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         }
 
         return bean;
+    }
+
+    private boolean applyBeanPostProcessorsAfterInstantiation(String beanName, Object bean) {
+        boolean continueWithPropertyPopulation = true;
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
+                if (!((InstantiationAwareBeanPostProcessor) beanPostProcessor).postProcessAfterInstantiation(bean, beanName)) {
+                    continueWithPropertyPopulation = false;
+                    break;
+                }
+            }
+        }
+        return continueWithPropertyPopulation;
     }
 
     protected void registerDisposableBeanIfNecessary(String beanName, Object bean, BeanDefinition beanDefinition) {
@@ -106,7 +150,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
             Object current = beanPostProcessor.postProcessBeforeInitialization(existingBean, beanName);
             if (current == null) {
-                continue;
+                return result;
             }
             result = current;
         }
@@ -119,7 +163,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
             Object current = beanPostProcessor.postProcessAfterInitialization(existingBean, beanName);
             if (current == null) {
-                continue;
+                return result;
             }
             result = current;
         }

@@ -58,4 +58,21 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor{
      */
     PropertyValues postProcessPropertyValues(PropertyValues pvs, Object bean, String beanName) throws BeansException;
 
+    /**
+     * 在 Bean 实例化之后、属性填充（依赖注入）之前被调用的回调方法。
+     * <p>
+     * 返回 {@code true} 表示继续对该 Bean 进行属性注入；
+     * 返回 {@code false} 则表示跳过后续的属性填充阶段，Spring 将不再自动注入该 Bean 的属性。
+     * <p>
+     * 这个方法适用于在属性注入前进行一些条件判断、缓存短路、或记录等操作。
+     * <p>
+     * 注意：此时 Bean 已经完成构造，但尚未进行依赖注入或初始化回调（如 {@code @PostConstruct}、InitializingBean 等）。
+     *
+     * @param bean     已实例化但尚未注入属性的 Bean 实例。
+     * @param beanName 当前 Bean 在容器中的名称。
+     * @return {@code true} 表示继续进行属性注入；{@code false} 表示跳过该 Bean 的属性注入。
+     * @throws BeansException 如果在处理过程中发生异常，Spring 会中止该 Bean 的创建流程。
+     */
+    boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException;
+
 }

@@ -69,6 +69,11 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
     }
 
     @Override
+    public boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException {
+        return true;
+    }
+
+    @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         return bean;
     }
@@ -88,7 +93,8 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
 
                     BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
                     Object instantiate = beanFactory.getInstantiationStrategy().instantiate(beanDefinition);
-                    TargetSource targetSource = new TargetSource(instantiate);
+
+                    TargetSource targetSource = new TargetSource(bean);
                     advisedSupport.setTargetSource(targetSource);
                     advisedSupport.setMethodMatcher(advisor.getPointcut().getMethodMatcher());
                     advisedSupport.setMethodInterceptor((MethodInterceptor) advisor.getAdvice());
