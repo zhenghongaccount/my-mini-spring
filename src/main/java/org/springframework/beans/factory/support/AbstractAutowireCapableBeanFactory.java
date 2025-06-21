@@ -74,11 +74,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      * 4. 注册为单例
      */
     protected Object doCreateBean(String beanName, BeanDefinition beanDefinition) throws BeansException{
-        Class<?> beanClass = beanDefinition.getBeanClass();
-        Object bean = null;
+        Object bean;
         try {
             bean = createBeanInstance(beanDefinition);
-            //实例化 bean 之后执行
+            // 为解决循环依赖问题，提前暴露 bean
+            earlySingletonObjects.put(beanName, bean);
+            // 实例化 bean 之后执行
             boolean continueWithPropertyPopulation = applyBeanPostProcessorsAfterInstantiation(beanName, bean);
             if (!continueWithPropertyPopulation) {
                 return bean;
