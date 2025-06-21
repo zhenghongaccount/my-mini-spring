@@ -43,9 +43,14 @@ public interface BeanFactory {
      * @param <T> 返回的 Bean 类型
      * @return 与指定类型匹配的唯一 Bean 实例
      * @throws BeansException 如果匹配不到或匹配多个 Bean 时抛出
-     *
-     * @author zhenghong
-     * @date 2015/6/15
      */
     <T> T getBean(Class<T> requiredType) throws BeansException;
+
+    /**
+     * 判断容器中是否包含指定名称的 Bean 定义或实例。
+     *
+     * @param name 要检查的 Bean 名称（ID 或别名）
+     * @return 如果容器中存在该名称的 Bean，返回 true；否则返回 false
+     */
+    boolean containsBean(String name);
 }

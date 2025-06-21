@@ -4,6 +4,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -11,6 +12,7 @@ import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.SimpleApplicationEventMulticaster;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.core.io.DefaultResourceLoader;
 
 import java.util.Collection;
@@ -34,34 +36,52 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
     public static final String APPLICATION_EVENT_MULTICASTER_BEAN_NAME = "applicationEventMulticaster";
 
+    public static final String CONVERSION_SERVICE_BEAN_NAME = "conversionService";
+
     private ApplicationEventMulticaster applicationEventMulticaster;
 
     @Override
     public void refresh() throws BeansException {
-        //创建 BeanFactory，并加载 BeanDefinition
+        // 创建 BeanFactory，并加载 BeanDefinition
         refreshBeanFactory();
         ConfigurableListableBeanFactory beanFactory = getBeanFactory();
 
-        //添加 ApplicationContextAwareProcessor，让继承自 ApplicationContextAware 的 bean 能感知 bean
+        // 添加 ApplicationContextAwareProcessor，让继承自 ApplicationContextAware 的 bean 能感知 bean
         beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
 
-        //在bean实例化之前，执行 BeanFactoryPostProcessor
+        // 在 bean 实例化之前，执行 BeanFactoryPostProcessor
         invokeBeanFactoryPostProcessors(beanFactory);
 
-        //BeanPostProcessor 需要提前与其他bean实例化之前注册
+        // BeanPostProcessor 需要提前与其他 bean 实例化之前注册
         registerBeanPostProcessors(beanFactory);
 
-        //初始化事件发布者
+        // 初始化事件发布者
         initApplicationEventMulticaster();
 
-        //注册事件监听器
+        // 注册事件监听器
         registerListeners();
 
-        //提前实例化单例 bean
-        beanFactory.preInstantiateSingletons();
+        // 设置类型转换服务中心和提前实例化单例 bean
+        finishBeanFactoryInitialization(beanFactory);
 
-        //发布容器刷新完成事件
+        // 发布容器刷新完成事件
         finishRefresh();
+    }
+
+    protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
+        if (beanFactory.containsBean(CONVERSION_SERVICE_BEAN_NAME)) {
+            Object bean = beanFactory.getBean(CONVERSION_SERVICE_BEAN_NAME);
+            if (bean instanceof ConversionService) {
+                beanFactory.setConversionService((ConversionService) bean);
+            }
+        }
+        // 提前实例化单例 bean
+        beanFactory.preInstantiateSingletons();
+    }
+
+    @Override
+    public boolean containsBean(String name) {
+        return getBeanFactory().containsBean(name);
     }
 
     /**

@@ -1,5 +1,6 @@
 package org.springframework.core.convert.support;
 
+import cn.hutool.core.convert.BasicType;
 import org.springframework.core.convert.*;
 
 import java.lang.reflect.ParameterizedType;
@@ -32,8 +33,10 @@ public class GenericConversionService implements ConversionService, ConverterReg
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T convert(Object source, Class<T> targetType) {
         Class<?> sourceType = source.getClass();
+        targetType = (Class<T>) BasicType.wrap(targetType);
         GenericConverter converter = getConverter(sourceType, targetType);
         Object result = converter.convert(source, sourceType, targetType);
         if (!targetType.isInstance(result)) {
@@ -72,6 +75,7 @@ public class GenericConversionService implements ConversionService, ConverterReg
 
     private List<Class<?>> getClassHierarchy(Class<?> clazz) {
         List<Class<?>> hierarchy = new ArrayList<Class<?>>();
+        clazz = BasicType.wrap(clazz);
         while (clazz != null) {
             hierarchy.add(clazz);
             clazz = clazz.getSuperclass();
