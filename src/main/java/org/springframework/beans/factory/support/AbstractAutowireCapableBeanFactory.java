@@ -37,7 +37,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
     @Override
     protected Object createBean(String beanName, BeanDefinition beanDefinition) throws BeansException {
-        //如果bean需要代理，则直接返回代理对象
+        // 如果 bean 需要代理，则直接返回代理对象
         Object bean = resolveBeforeInstantiation(beanName, beanDefinition);
         if (bean != null) {
             return bean;
@@ -78,7 +78,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         try {
             bean = createBeanInstance(beanDefinition);
             // 为解决循环依赖问题，提前暴露 bean
-            earlySingletonObjects.put(beanName, bean);
+            if (beanDefinition.isSingleton()) {
+                earlySingletonObjects.put(beanName, bean);
+            }
             // 实例化 bean 之后执行
             boolean continueWithPropertyPopulation = applyBeanPostProcessorsAfterInstantiation(beanName, bean);
             if (!continueWithPropertyPopulation) {
@@ -134,7 +136,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             ((BeanFactoryAware) bean).setBeanFactory(this);
         }
 
-        //执行BeanPostProcessor的前置处理
+        // 执行 BeanPostProcessor 的前置处理
         Object wrappedBean = applyBeanPostProcessorsBeforeInitialization(bean, beanName);
 
         try {
@@ -143,7 +145,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             throw new BeansException("Invocation of init method of bean[" + beanName + "] failed", ex);
         }
 
-        //执行BeanPostProcessor的后置处理
+        // 执行 BeanPostProcessor 的后置处理
         wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
         return wrappedBean;
     }

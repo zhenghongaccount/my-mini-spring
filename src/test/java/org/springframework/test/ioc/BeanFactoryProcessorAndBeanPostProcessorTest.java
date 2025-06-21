@@ -27,7 +27,7 @@ public class BeanFactoryProcessorAndBeanPostProcessorTest {
 
         Person person = (Person) beanFactory.getBean("person");
         System.out.println(person);
-        //name 属性在 CustomBeanFactoryPostProcessor 中被修改为 John Doe
+        // name 属性在 CustomBeanFactoryPostProcessor 中被修改为 John Doe
         assertThat(person.getName()).isEqualTo("John Doe");
     }
 
@@ -41,7 +41,7 @@ public class BeanFactoryProcessorAndBeanPostProcessorTest {
         Car car = (Car) beanFactory.getBean("car");
 
         System.out.println(car);
-        //brand 属性在 CustomerBeanPostProcessor 中被修改为 lamborghini
+        // brand 属性在 CustomerBeanPostProcessor 中被修改为 lamborghini
         assertThat(car.getBrand()).isEqualTo("lamborghini");
     }
 
