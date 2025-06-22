@@ -75,4 +75,29 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor{
      */
     boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException;
 
+    /**
+     * 提供对 Bean 的“早期引用”能力，通常用于处理循环依赖场景下的代理暴露。
+     * <p>
+     * 当 Spring 检测到存在构造器外的循环依赖时（例如 A 注入 B，B 又注入 A），
+     * 会在尚未完成属性注入和初始化前，调用此方法来尝试获取该 Bean 的“早期引用”。
+     * <p>
+     * 对于需要进行 AOP 增强的 Bean，开发者可在此方法中返回一个代理对象，
+     * 以确保注入到其他 Bean 中的是代理对象而不是原始对象，避免 AOP 增强失效。
+     * <p>
+     * 默认实现直接返回原始 Bean，如果需要支持自动代理（如 AOP），
+     * 可以在实现类中覆盖此方法并调用代理创建逻辑（如 wrapIfNecessary）。
+     * <p>
+     * 此方法的典型调用者是 {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory}，
+     * 在调用 {@code addSingletonFactory()} 注册 ObjectFactory 进行循环依赖处理时，
+     * 使用该方法作为创建早期对象引用的入口。
+     *
+     * @param bean     原始实例化后的 Bean 对象（尚未属性填充与初始化）
+     * @param beanName 当前 Bean 的名称，用于标识和条件控制
+     * @return 提供给其他 Bean 引用的“早期引用”，可为原始对象或代理对象
+     * @throws BeansException 如果创建早期引用时发生错误，可抛出该异常
+     */
+    default Object getEarlyBeanReference(Object bean, String beanName) throws BeansException {
+        return bean;
+    }
+
 }

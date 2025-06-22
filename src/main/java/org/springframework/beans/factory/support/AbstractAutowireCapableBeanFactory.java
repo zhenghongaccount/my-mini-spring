@@ -8,9 +8,7 @@ import cn.hutool.core.util.TypeUtil;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.PropertyValues;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.*;
 import org.springframework.beans.factory.config.*;
 import org.springframework.core.convert.ConversionService;
 
@@ -79,7 +77,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             bean = createBeanInstance(beanDefinition);
             // 为解决循环依赖问题，提前暴露 bean
             if (beanDefinition.isSingleton()) {
-                earlySingletonObjects.put(beanName, bean);
+                Object finalBean = bean;
+                addSingletonFactory(beanName, () -> getEarlyBeanReference(finalBean, beanName));
             }
             // 实例化 bean 之后执行
             boolean continueWithPropertyPopulation = applyBeanPostProcessorsAfterInstantiation(beanName, bean);
@@ -97,10 +96,25 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         }
         registerDisposableBeanIfNecessary(beanName, bean, beanDefinition);
         if (beanDefinition.isSingleton()) {
-            addSingleton(beanName, bean);
+            //如果有代理对象，此处获取代理对象
+            Object exposedObject = getSingleton(beanName);
+            addSingleton(beanName, exposedObject);
         }
 
         return bean;
+    }
+
+    protected Object getEarlyBeanReference(Object bean, String beanName) {
+        Object exposedObject = bean;
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
+                exposedObject = ((InstantiationAwareBeanPostProcessor) beanPostProcessor).getEarlyBeanReference(bean, beanName);
+                if (exposedObject == null) {
+                    return null;
+                }
+            }
+        }
+        return exposedObject;
     }
 
     private boolean applyBeanPostProcessorsAfterInstantiation(String beanName, Object bean) {

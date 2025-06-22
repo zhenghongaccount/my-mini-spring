@@ -93,8 +93,7 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
 
                     BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
                     Object instantiate = beanFactory.getInstantiationStrategy().instantiate(beanDefinition);
-
-                    TargetSource targetSource = new TargetSource(bean);
+                    TargetSource targetSource = new TargetSource(instantiate);
                     advisedSupport.setTargetSource(targetSource);
                     advisedSupport.setMethodMatcher(advisor.getPointcut().getMethodMatcher());
                     advisedSupport.setMethodInterceptor((MethodInterceptor) advisor.getAdvice());
